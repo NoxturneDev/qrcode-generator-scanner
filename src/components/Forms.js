@@ -91,14 +91,14 @@ function Forms() {
                                 placeholder="No Handhpone"
                                 autoComplete="off"
                                 focusBorderColor='purple.500'
-                                onChange={e => { setRefferal(e.target.value) }}
+                                onChange={e => { setPhone(e.target.value) }}
                                 required />
 
                             <Input type="text"
                                 placeholder="Code Referral"
                                 autoComplete="off"
                                 focusBorderColor='purple.500'
-                                onChange={e => { setPhone(e.target.value) }}
+                                onChange={e => { setRefferal(e.target.value) }}
                                 textTransform={'uppercase'}
                                 fontWeight={'medium'}
                                 letterSpacing={'1px'}
