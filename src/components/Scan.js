@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Html5Qrcode, Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
 import {
 
     FormControl,
@@ -7,10 +7,10 @@ import {
     Button,
     ButtonGroup,
     Flex,
-    Box,
     Heading
 
 } from '@chakra-ui/react'
+import customToast from './Toast'
 
 function Scan() {
 
@@ -31,6 +31,7 @@ function Scan() {
         setScanned(true)
         html5QrCode.stop()
         // TOAST SUCCESS HERE
+        customToast('success', 'Berhasil scan')
     }
 
     function onScanFailure(error) {

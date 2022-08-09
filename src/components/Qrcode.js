@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import QRcode from 'qrcode'
 import { gsap } from 'gsap'
 import { Button, Flex, ButtonGroup, Box, Heading } from '@chakra-ui/react'
+import customToast from './Toast'
 
 function Qrcode({ data, hidden }) {
 
@@ -43,6 +44,7 @@ function Qrcode({ data, hidden }) {
             display: 'flex'
         })
 
+        customToast('success', 'Berhasil buat QrCode')
     }
     if (hidden) return
 
