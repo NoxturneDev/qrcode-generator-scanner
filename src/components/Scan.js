@@ -2,13 +2,10 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
 import {
 
-    FormControl,
-    Input,
     Button,
     ButtonGroup,
     Flex,
-    Box,
-    Heading
+    Box
 
 } from '@chakra-ui/react'
 import customToast from './Toast'
@@ -17,6 +14,7 @@ import Result from './Result'
 function Scan() {
 
     const [scanned, setScanned] = useState(false)
+    const [scanning, setScanning] = useState(false)
     const scannerRef = useRef()
 
     const [data, setData] = useState({})
@@ -28,9 +26,9 @@ function Scan() {
 
         setData(JSON.parse(decodedResult.result.text))
         html5QrCode.stop().then(() => {
-            console.log('stop')
-            setScanned(true)
 
+            setScanning(false)
+            setScanned(true)
 
         })
         // TOAST SUCCESS HERE
@@ -42,6 +40,13 @@ function Scan() {
     }
 
     const scanQr = () => {
+        // const reader = document.createElement('div')
+        // reader.id = "reader"
+
+        // document.getElementById('wrapper').appendChild(reader)
+
+        html5QrCode = new Html5Qrcode("reader")
+
         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
         const cameraId = Html5Qrcode.getCameras()
 
@@ -61,11 +66,14 @@ function Scan() {
 
     const stopScan = () => {
 
+        // !NOT WORKING BCS UNDEFINED
         html5QrCode.stop()
 
     }
 
     const startScan = (id, config) => {
+        setScanning(true)
+
         html5QrCode.start(
             id, config, onScanSuccess, onScanFailure)
 
@@ -75,11 +83,11 @@ function Scan() {
             });
     }
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        html5QrCode = new Html5Qrcode(scannerRef.current.id);
+    //     html5QrCode = new Html5Qrcode(scannerRef.current.id);
 
-    }, [data])
+    // }, [data])
 
     return (
         <>
@@ -94,30 +102,38 @@ function Scan() {
 
                 <Flex
                     flexDir={'column'}
-                    w={'lg'}
+                    w={'full'}
                     h={'xl'}
                     borderRadius={'md'}
                     boxShadow={'md'}
                     p={4}
                     bgColor={'gray.800'}
                     justifyContent={'center'}
-                    alignItems={'center'}>
+                    alignItems={'center'}
+                    position={'relative'}>
 
-                    <div id="reader" w="600px" ref={scannerRef}></div>
+                    <Flex id="wrapper"
+                        zIndex={'sticky'}
+                        p={5}
+                        // position={{ base: 'absolute', md: 'fixed' }}
+                        // w={{ base: '100vw', md: 'md' }}
+                        // h={{ base: '100vh', md: 'lg' }}
+                        pointerEvents={'none'}
+                        justifyContent={'center'}
+                        alignItems={'center'}>
 
-                    <FormControl mb={4}>
-                        <Flex
-                            flexDir={'column'}
-                            gap={4}>
+                        <Box id="reader"
+                            w={{ base: '100vw', md: 'md' }}
+                            // h={{ base: '100vh', md: 'md' }}
+                            ref={scannerRef} ></Box>
 
-                            {/* <input type="file" name="file" id="qr-input-file" capture onChange={e => { scanFile(e) }} /> */}
+                    </Flex>
 
-                        </Flex>
-                    </FormControl>
                     <ButtonGroup>
                         <Flex gap={4}>
                             <Button colorScheme='purple' onClick={scanQr}>Scan QR</Button>
-                            <Button colorScheme='purple' onClick={stopScan}>STOP SCAN</Button>
+                            <Button colorScheme='purple' onClick={stopScan}
+                                hidden={scanning ? false : true}>STOP SCAN</Button>
                         </Flex>
                     </ButtonGroup>
 
