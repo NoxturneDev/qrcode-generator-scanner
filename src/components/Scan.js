@@ -5,7 +5,9 @@ import {
     Button,
     ButtonGroup,
     Flex,
-    Box
+    Box,
+    Text,
+    Select
 
 } from '@chakra-ui/react'
 import customToast from './Toast'
@@ -13,11 +15,16 @@ import Result from './Result'
 
 function Scan() {
 
+    const [scanner, setScanner] = useState()
     const [scanned, setScanned] = useState(false)
     const [scanning, setScanning] = useState(false)
-    const scannerRef = useRef()
-
+    const [camera, setCamera] = useState([])
     const [data, setData] = useState({})
+
+    const scannerRef = useRef()
+    const cameras = []
+
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
     let html5QrCode
 
@@ -39,26 +46,28 @@ function Scan() {
         console.warn(`Code scan error = ${error}`);
     }
 
-    const scanQr = () => {
-        // const reader = document.createElement('div')
-        // reader.id = "reader"
-
-        // document.getElementById('wrapper').appendChild(reader)
+    const initScan = () => {
 
         html5QrCode = new Html5Qrcode("reader")
 
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        setScanner(html5QrCode)
+
         const cameraId = Html5Qrcode.getCameras()
 
         cameraId.then(devices => {
+            console.log(devices)
+
             if (devices && devices.length) {
+                cameras.push([...devices])
+                setCamera(cameras[0])
+
                 const id = devices[0].id;
 
                 startScan(id, config)
             }
-
         }).catch(err => {
-            // TOAST ERROR HERE
+
+            customToast('error', err)
             console.error(err)
         });
 
@@ -66,8 +75,22 @@ function Scan() {
 
     const stopScan = () => {
 
-        // !NOT WORKING BCS UNDEFINED
-        html5QrCode.stop()
+        console.log(camera)
+        setScanning(false)
+        scanner.stop()
+
+    }
+
+    const changeCamera = (id, config, currentScan) => {
+
+        // currentScan.stop()
+        scanner.stop()
+        scanner.start(id, config, onScanSuccess, onScanFailure)
+            .catch(err => {
+
+                console.log(err)
+
+            })
 
     }
 
@@ -83,12 +106,6 @@ function Scan() {
             });
     }
 
-    // useEffect(() => {
-
-    //     html5QrCode = new Html5Qrcode(scannerRef.current.id);
-
-    // }, [data])
-
     return (
         <>
 
@@ -102,7 +119,7 @@ function Scan() {
 
                 <Flex
                     flexDir={'column'}
-                    w={'full'}
+                    w={{ sm: '100vw', md: "lg" }}
                     h={'xl'}
                     borderRadius={'md'}
                     boxShadow={'md'}
@@ -113,11 +130,9 @@ function Scan() {
                     position={'relative'}>
 
                     <Flex id="wrapper"
-                        zIndex={'sticky'}
                         p={5}
                         // position={{ base: 'absolute', md: 'fixed' }}
-                        // w={{ base: '100vw', md: 'md' }}
-                        // h={{ base: '100vh', md: 'lg' }}
+                        w={{ base: '100%', md: 'md' }}
                         pointerEvents={'none'}
                         justifyContent={'center'}
                         alignItems={'center'}>
@@ -125,13 +140,26 @@ function Scan() {
                         <Box id="reader"
                             w={{ base: '100vw', md: 'md' }}
                             // h={{ base: '100vh', md: 'md' }}
-                            ref={scannerRef} ></Box>
+                            ref={scannerRef}>
+                        </Box>
 
                     </Flex>
 
+
+                    <Select color={'gray.500'} bgColor={'gray.800'} m={2}
+                        onChange={e => {
+                            changeCamera(e.target.value, config)
+                        }}>
+                        {camera.length < 0 ? '' : camera.map(cam => {
+                            return <option key={cam.id} id={cam.id} value={cam.id}>{cam.label}</option>
+                        })}
+                    </Select>
+
+
+
                     <ButtonGroup>
                         <Flex gap={4}>
-                            <Button colorScheme='purple' onClick={scanQr}>Scan QR</Button>
+                            <Button colorScheme='purple' onClick={initScan}>Scan QR</Button>
                             <Button colorScheme='purple' onClick={stopScan}
                                 hidden={scanning ? false : true}>STOP SCAN</Button>
                         </Flex>
