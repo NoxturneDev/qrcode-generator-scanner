@@ -7,10 +7,12 @@ import {
     Button,
     ButtonGroup,
     Flex,
+    Box,
     Heading
 
 } from '@chakra-ui/react'
 import customToast from './Toast'
+import Result from './Result'
 
 function Scan() {
 
@@ -18,34 +20,25 @@ function Scan() {
     const scannerRef = useRef()
 
     const [data, setData] = useState({})
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [ticket, setTicket] = useState('')
-    const [refferal, setRefferal] = useState('')
+
     let html5QrCode
 
     function onScanSuccess(decodedText, decodedResult) {
         console.log(`Code matched = ${decodedText}`, decodedResult);
 
         setData(JSON.parse(decodedResult.result.text))
-        setScanned(true)
-        html5QrCode.stop()
+        html5QrCode.stop().then(() => {
+            console.log('stop')
+            setScanned(true)
+
+
+        })
         // TOAST SUCCESS HERE
         customToast('success', 'Berhasil scan')
     }
 
     function onScanFailure(error) {
         console.warn(`Code scan error = ${error}`);
-    }
-
-    function renderResult() {
-
-        console.log(data)
-        setName(data.name)
-        setTicket(data.ticket)
-        setRefferal(data.refferal)
-        setPhone(data.phone)
-
     }
 
     const scanQr = () => {
@@ -86,7 +79,7 @@ function Scan() {
 
         html5QrCode = new Html5Qrcode(scannerRef.current.id);
 
-    }, [])
+    }, [data])
 
     return (
         <>
@@ -125,64 +118,12 @@ function Scan() {
                         <Flex gap={4}>
                             <Button colorScheme='purple' onClick={scanQr}>Scan QR</Button>
                             <Button colorScheme='purple' onClick={stopScan}>STOP SCAN</Button>
-                            <Button colorScheme='purple' onClick={renderResult}>SEE RESULT!</Button>
                         </Flex>
                     </ButtonGroup>
 
-                    <Heading>RESULT</Heading>
-                    <FormControl mb={4} hidden={scanned ? false : true}>
-                        <Flex
-                            flexDir={'column'}
-                            gap={4}
-                            color={'gray.200'}>
+                    <Result data={data} scanned={scanned}></Result>
 
-                            <label>Nama</label>
-                            <Input type="text"
-                                placeholder="Nama anda"
-                                autoComplete="off"
-                                focusBorderColor='purple.500'
-                                value={name == '' ? 'nama' : name}
-                                readOnly
-                                controlled="true"
-                                required />
-
-                            <label>No Handphone</label>
-                            <Input type="number"
-                                placeholder="No Handhpone"
-                                autoComplete="off"
-                                focusBorderColor='purple.500'
-                                value={phone == '' ? 'Phone' : phone}
-                                readOnly
-                                controlled="true"
-                                required />
-
-                            <label>Kode Refferal</label>
-                            <Input type="text"
-                                placeholder="Code Referral"
-                                autoComplete="off"
-                                focusBorderColor='purple.500'
-                                textTransform={'uppercase'}
-                                fontWeight={'medium'}
-                                letterSpacing={'1px'}
-                                value={refferal == '' ? 'Kode' : refferal}
-                                readOnly
-                                controlled="true"
-                                required />
-
-                            <label>Jenis Tiket</label>
-                            <Input type="text"
-                                placeholder="Paket"
-                                autoComplete="off"
-                                focusBorderColor='purple.500'
-                                controlled="true"
-                                value={ticket == '' ? 'Ticket' : ticket}
-                                readOnly
-                                required />
-                        </Flex>
-                    </FormControl>
                 </Flex>
-
-
 
             </Flex>
 
