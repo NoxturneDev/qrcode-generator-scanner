@@ -1,10 +1,17 @@
-import { Box } from "@chakra-ui/react";
-
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import Forms from './components/Forms';
+import Scan from './components/Scan';
 function App() {
   return (
-  <>
-    <h1>qr code</h1>  
-  </>
+
+    <BrowserRouter>
+
+      <Routes>
+        <Route path='/' element={<Forms />} />
+        <Route path='/scan' element={<Scan />} />
+      </Routes>
+
+    </BrowserRouter>
 
   );
 }
